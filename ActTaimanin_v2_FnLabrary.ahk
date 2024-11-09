@@ -5,7 +5,7 @@
 
 Return
 
-#HotIf WinActive("ahk_exe ActionTaimanin.exe")
+#HotIf WinActive("ahk_exe", "ActionTaimanin.exe")
 ;====================== - Sub Functions - ======================;
 searchAndWait(searchDuration, searchInterval, filename, X1 := 0, Y1 := 0, X2 := 2573, Y2 := 1498, writeLog := 1)
 {
@@ -53,12 +53,12 @@ checkLobbyEvent()
 ; Old: BackToMain
 returnToHomePage(Error_Global := 0)
 {
-    WinActivate, ActionTaimanin ahk_class UnityWndClass
-    Gosub, ClickRTB
+    WinActivate("ahk_exe ActionTaimanin.exe")
+    ClickRTB()
     Sleep 500
     Loop 7
     {
-        Click, 1280, 128 0
+        ActTaimanin_Click(1280, 128, 0)
         E_Level := searchAndWait(1000, 250, "Menu_Main_0.png", 0, 0, 512, 128, 0)
         ; Old coor: 2240, 560, 2504, 880)
         If (E_Level == 0)
@@ -70,7 +70,7 @@ returnToHomePage(Error_Global := 0)
         }
         Else If (E_Level == 1)
         {
-            Send { Esc }
+            Send "{Esc}"
             Sleep 200
             Sleep 1000
             Error_Local := 2
@@ -81,9 +81,7 @@ returnToHomePage(Error_Global := 0)
             fnWriteLog("Error", "Main_Menu Searching Crashed!")
         }
     }
-    Click, 1120, 1088 0       ;
-    Sleep 100              ;
-    Click                   ;
+    ActTaimanin_Click(1120, 1088, 0)
     Sleep 300
     Gosub ClickVoid                 ; 100 ms
     Sleep 1000
@@ -607,20 +605,25 @@ SoundAlarm_1:
     }
 
 
-Factory_Menu:
-    If (Check_Main_Menu(0) > 0)
+    Factory_Menu()
     {
-        Gosub SoundAlarm
-        Error_Loacl ++
+        If (Check_Main_Menu(0) > 0)
+        {
+            Gosub SoundAlarm
+            Error_Loacl := Error_Loacl + 1
+        }
+        ; 2500ms
+        ActTaimanin_Click(140, 1400, 1, 200)
+        Sleep 2300
+        Return
     }
-    ; 2500ms
-    ActTaimanin_Click(140, 1400, 1, 200)
-    Sleep 2300
-    Return
 
-    ActTaimanin_Click(Coor_X, Coor_Y, Times := 1, Sleep_Time := 100)
+    ActTaimanin_Click(posX, posY, Times := 1, Sleep_Time := 100)
     {
-        Click, %Coor_X%, %Coor_Y% 0
+        Coord := CoordTransfer(posX, posY)
+
+        Click Coord.X, Coord.Y 0
+
         Loop Times
         {
             Sleep Sleep_Time
@@ -632,30 +635,46 @@ Factory_Menu:
     {
         Loop Times
         {
-            Click, WheelDown
+            Click "WheelDown"
             Sleep Sleep_Time
         }
         Return
     }
 
-ClickVoid:      ;   ---------- BLOCK_TIME = 100 ms ----------   ;
-    ActTaimanin_Click(2544, 288)
-    Return
+    ClickVoid()      ;   ---------- BLOCK_TIME = 100 ms ----------   ;
+    {
+        ActTaimanin_Click(2544, 288)
+        Return
+    }
 
-ClickRTB:
-    ActTaimanin_Click(410, 110)
-    Return
+    ClickRTB()
+    {
+        ActTaimanin_Click(410, 110)
+        Return
+    }
 
-ClickEnter:
-    ActTaimanin_Click(2155, 1408)
-    ; ActTaimanin_Click(2128, 1408)
-    ; Click, 2048, 1408 0
-    Return
+    ClickEnter()
+    {
+        ActTaimanin_Click(2155, 1408)
+        ; ActTaimanin_Click(2128, 1408)
+        ; Click, 2048, 1408 0
+        Return
+    }
 
-ClickRedoMission:
-    ActTaimanin_Click(2000, 1408)
-    Return
+    ClickRedoMission()
+    {
+        ActTaimanin_Click(2000, 1408)
+        Return
+    }
 
+    CoordTransfer(posX, posY, resX := 1600, resY := 900) ; from 2560x1440
+    {
+        ; 2560 x 1440:
+        Coord := Object()
+        Coord.X := resX * 410 / 2560
+        Coord.Y := resY * 110 / 1440
+        return Coord
+    }
     ;===================== - HotKeys Setting - =====================;
     ;            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⡀⠀⠀⣀⡀⠀⠀⠀⠀⠀⠀⠀
     ;            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⣿⣿⠀⣼⣿⣿⣦⡀⠀⠀⠀⠀⠀
