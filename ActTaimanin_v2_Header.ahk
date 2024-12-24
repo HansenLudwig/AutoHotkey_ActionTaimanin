@@ -1,5 +1,9 @@
 #Requires AutoHotkey v2.0
 
+#Include ActTaimanin_v2_FnLabrary.ahk
+
+#include ActTaimanin_v2_Autohk_Yukikaze_AutoAIM.ahk
+
 
 Settings_Default:
     ;--------------------- = Factory Setting = ---------------------;
